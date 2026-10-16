@@ -42,6 +42,13 @@ for code, body in zip(sections[1::2], sections[2::2]):
     assert sum(len(term.split()) for term in t['terms']) <= 21, code
     assert len(t['captions']) == len(SCREENSHOTS), code
 
+# Each listing's title is the app's name in that language, taken from the app's own texts.
+# Partner Center accepts only names reserved for the app (Manage app names).
+names_source = io.open(os.path.join(repo, 'lang', 'make_languages.py'), encoding='utf-8').read()
+languages = re.findall(r'"(\w\w)"', re.search(r'^LANGUAGES = \[(.*)\]', names_source, re.M).group(1))
+names = re.findall(r'"([^"]+)"', re.search(r'^"app\.name": \[(.*)\],', names_source, re.M).group(1))
+title = dict(zip(languages, names))
+
 rows = list(csv.reader(io.StringIO(io.open(exported, encoding='utf-8-sig').read())))
 column = {name: i for i, name in enumerate(rows[0])}
 if os.path.exists(out):
@@ -57,7 +64,7 @@ def value(field, code, t):
     if field in ('ShortDescription', 'Description', 'ReleaseNotes'):
         return t[field]
     fixed = {
-        'Title': 'Reiks Viewer',
+        'Title': title[code[:2]],
         'DevStudio': 'Reiks Apps',
         'CopyrightTrademarkInformation': '© 2026 Reiks Apps',
         'AdditionalLicenseTerms': LICENSE,
