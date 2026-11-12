@@ -29,7 +29,7 @@ Fixed for the life of the app; `installer\store\AppxManifest.xml` must carry exa
 - Name: `ReiksApps.Reiksviewer` (lowercase v)
 - Publisher: `CN=54F64895-82FA-479D-9B7B-BE225219235C`
 - PublisherDisplayName: `Reiks Apps`
-- Store ID: `9N4D3NC940GD`; Store page `https://apps.microsoft.com/detail/9N4D3NC940GD`
+- Store ID: `9P7BTXWFB38X`; Store page `https://apps.microsoft.com/detail/9P7BTXWFB38X`; package family name `ReiksApps.Reiksviewer_vvtmz01r3b5q8`. (An ID noted earlier, 9N4D3NC940GD, was wrong: it leads to "product not found". Check the ID under Product management → Product Identity.)
 
 The package's DisplayName must be a name reserved in Partner Center, with the same capitals:
 "Reiks Viewer".
@@ -129,7 +129,7 @@ Publishing; an email comes when it is done.
 ## After a private submission
 
 Install from the Store with the account in the private group (the Microsoft Store app must be
-signed in with it): `ms-windows-store://pdp/?productid=9N4D3NC940GD`. Check that it starts, that
+signed in with it): `ms-windows-store://pdp/?productid=9P7BTXWFB38X`. Check that it starts, that
 "Open codecs folder" opens a folder under `%LOCALAPPDATA%\Packages\`, that "Check for updates"
 opens the Store page, and that pictures and videos list it under "Open with". Then submit again
 with Public audience, and add the Store link to the website.

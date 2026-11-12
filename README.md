@@ -3,7 +3,7 @@
 A simple picture and video viewer for Windows, made for private use. Your pictures and videos stay yours: Reiks Viewer shows them only to you, and that is all it does.
 
 **[Download for Windows](https://github.com/reiks-apps/reiks-viewer/releases/latest/download/ReiksViewer-Setup.exe)**
- · **[Get it from Microsoft Store](https://apps.microsoft.com/detail/9N4D3NC940GD)**
+ · **[Get it from Microsoft Store](https://apps.microsoft.com/detail/9P7BTXWFB38X)**
  · [Portable zip](https://github.com/reiks-apps/reiks-viewer/releases/latest/download/ReiksViewer-portable.zip)
  · [Website](https://reiks-apps.github.io/reiks-viewer/)
 
