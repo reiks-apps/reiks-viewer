@@ -37,6 +37,8 @@
     font-weight: 600; font-size: 18px; padding: 14px 28px; border-radius: 10px;
   }
   .button:hover { opacity: .88; }
+  .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .button.second { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--soft); }
   .under { color: var(--soft); font-size: 15px; margin-top: 16px; }
   .under a { text-underline-offset: 3px; }
   .shot {
@@ -102,7 +104,10 @@
   <img class="icon" src="../img/icon.png" alt="Ikon för Reiks Visare" width="96" height="96">
   <h1>Reiks Visare</h1>
   <p class="tagline">Dina bilder och videor förblir dina. Reiks Visare visar dem bara för dig, och det är allt den gör.</p>
-  <a class="button" href="https://github.com/reiks-apps/reiks-viewer/releases/download/v1.6.0/ReiksViewer-Setup-1.6.0.exe">Ladda ner för Windows</a>
+  <div class="buttons">
+    <a class="button" href="https://github.com/reiks-apps/reiks-viewer/releases/download/v1.6.0/ReiksViewer-Setup-1.6.0.exe">Ladda ner för Windows</a>
+    <a class="button second" href="https://apps.microsoft.com/detail/9N4D3NC940GD">Hämta från Microsoft Store</a>
+  </div>
   <p class="under">
     <strong>Version 1.6.0</strong> &middot; <a href="https://github.com/reiks-apps/reiks-viewer/releases/tag/v1.6.0">Nyheter</a><br>
     Gratis &middot; öppen källkod &middot; ansluter aldrig till internet &middot; Windows 10 eller 11, 64-bitars<br>
@@ -185,6 +190,7 @@
     <h2>Installation</h2>
     <div class="note">
       <p><strong>Windows kan varna dig första gången.</strong> Installationsprogrammet är ännu inte digitalt signerat, så Windows kan visa &rdquo;Windows skyddade datorn&rdquo;. Välj <em>Mer information</em> och sedan <em>Kör ändå</em>.</p>
+      <p><strong>Eller hämta den från Microsoft Store.</strong> <a href="https://apps.microsoft.com/detail/9N4D3NC940GD">Kopian i Store</a> är samma app. Microsoft signerar den, så Windows visar inte den varningen, och Store installerar dess uppdateringar.</p>
       <p>För att kontrollera att din nedladdning är hel och stämmer med den publicerade filen, jämför dess SHA-256-kontrollsumma med <a href="https://github.com/reiks-apps/reiks-viewer/releases/download/v1.6.0/SHA256SUMS.txt">SHA256SUMS.txt</a>. I PowerShell: <code>Get-FileHash ReiksViewer-Setup-1.6.0.exe</code></p>
       <p>Att installera bara för dig själv kräver inga administratörsrättigheter; att installera för alla användare gör det. Installationsprogrammet kan lägga till Reiks Visare i Utforskarens lista &rdquo;Öppna med&rdquo;. För att uppdatera kör du ett nyare installationsprogram över det gamla; &rdquo;Sök efter uppdateringar&rdquo; i appen (F1) öppnar nedladdningssidan i din webbläsare, och själva appen förblir offline.</p>
       <p>Reiks Visare är testad på Windows 11. Den bör även fungera på Windows 10, men det har ännu inte testats.</p>

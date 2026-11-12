@@ -35,6 +35,8 @@
     font-weight: 600; font-size: 18px; padding: 14px 28px; border-radius: 10px;
   }
   .button:hover { opacity: .88; }
+  .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .button.second { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--soft); }
   .under { color: var(--soft); font-size: 15px; margin-top: 16px; }
   .under a { text-underline-offset: 3px; }
   .shot {
@@ -100,7 +102,10 @@
   <img class="icon" src="{{up}}img/icon.png" alt="{{icon.alt}}" width="96" height="96">
   <h1>{{name}}</h1>
   <p class="tagline">{{tagline}}</p>
-  <a class="button" href="https://github.com/reiks-apps/reiks-viewer/releases/download/v{v}/ReiksViewer-Setup-{v}.exe">{{download}}</a>
+  <div class="buttons">
+    <a class="button" href="https://github.com/reiks-apps/reiks-viewer/releases/download/v{v}/ReiksViewer-Setup-{v}.exe">{{download}}</a>
+    <a class="button second" href="https://apps.microsoft.com/detail/9N4D3NC940GD">{{store}}</a>
+  </div>
   <p class="under">
     <strong>{{version}}</strong> &middot; <a href="https://github.com/reiks-apps/reiks-viewer/releases/tag/v{v}">{{whatsnew}}</a><br>
     {{under}}<br>
@@ -183,6 +188,7 @@
     <h2>{{install.h}}</h2>
     <div class="note">
       <p>{{install.1}}</p>
+      <p>{{install.store}}</p>
       <p>{{install.2}}</p>
       <p>{{install.3}}</p>
       <p>{{install.4}}</p>

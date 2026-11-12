@@ -22,6 +22,7 @@ T = {
 "version": ("Version {v}", "Versión {v}", "Version {v}"),
 "whatsnew": ("What&rsquo;s new", "Novedades", "Nyheter"),
 "download": ("Download for Windows", "Descargar para Windows", "Ladda ner för Windows"),
+"store": ("Get it from Microsoft Store", "Consíguelo en Microsoft Store", "Hämta från Microsoft Store"),
 "under": (
  "Free &middot; open source &middot; never connects to the internet &middot; Windows 10 or 11, 64-bit",
  "Gratis &middot; código abierto &middot; nunca se conecta a internet &middot; Windows 10 u 11, 64 bits",
@@ -172,6 +173,10 @@ T = {
  "<strong>Windows may warn you the first time.</strong> The installer is not digitally signed yet, so Windows can show &ldquo;Windows protected your PC&rdquo;. Choose <em>More info</em>, then <em>Run anyway</em>.",
  "<strong>Windows puede avisarte la primera vez.</strong> El instalador aún no está firmado digitalmente, así que Windows puede mostrar &laquo;Windows protegió su PC&raquo;. Elige <em>Más información</em> y luego <em>Ejecutar de todas formas</em>.",
  "<strong>Windows kan varna dig första gången.</strong> Installationsprogrammet är ännu inte digitalt signerat, så Windows kan visa &rdquo;Windows skyddade datorn&rdquo;. Välj <em>Mer information</em> och sedan <em>Kör ändå</em>."),
+"install.store": (
+ "<strong>Or get it from the Microsoft Store.</strong> <a href=\"https://apps.microsoft.com/detail/9N4D3NC940GD\">The copy in the Store</a> is the same app. Microsoft signs it, so Windows does not show that warning, and the Store installs its updates.",
+ "<strong>O consíguelo en Microsoft Store.</strong> <a href=\"https://apps.microsoft.com/detail/9N4D3NC940GD\">La copia de la Store</a> es la misma aplicación. Microsoft la firma, así que Windows no muestra ese aviso, y la Store instala sus actualizaciones.",
+ "<strong>Eller hämta den från Microsoft Store.</strong> <a href=\"https://apps.microsoft.com/detail/9N4D3NC940GD\">Kopian i Store</a> är samma app. Microsoft signerar den, så Windows visar inte den varningen, och Store installerar dess uppdateringar."),
 "install.2": (
  "To check that your download is complete and matches the published file, compare its SHA-256 checksum with <a href=\"https://github.com/reiks-apps/reiks-viewer/releases/download/v{v}/SHA256SUMS.txt\">SHA256SUMS.txt</a>. In PowerShell: <code>Get-FileHash ReiksViewer-Setup-{v}.exe</code>",
  "Para comprobar que tu descarga está completa y coincide con el archivo publicado, compara su suma SHA-256 con <a href=\"https://github.com/reiks-apps/reiks-viewer/releases/download/v{v}/SHA256SUMS.txt\">SHA256SUMS.txt</a>. En PowerShell: <code>Get-FileHash ReiksViewer-Setup-{v}.exe</code>",
