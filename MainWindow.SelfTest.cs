@@ -43,6 +43,7 @@ public partial class MainWindow
             _player.Seek(1.0); await Task.Delay(800); Log("seek 1.0 paused");
             for (int i = 0; i < 3; i++) { _player.Step(-1); await Task.Delay(300); Log($"step -1 (#{i + 1})"); }
             Snapshot(Path.Combine(outputFolder, "3-seeked.png"));
+            await StepModeChecks(log, outputFolder);
 
             ToggleImagePanel();
             var sliders = ((System.Windows.Controls.Panel)((System.Windows.Controls.ScrollViewer)_imagePanel!.Child).Content).Children
@@ -238,6 +239,110 @@ public partial class MainWindow
     // "ReiksViewer.exe --screenshot <file> <png> <seconds> <none|picture|more|options|print|hide> [WxH]"
     // opens a file, pauses a video at the given time, optionally opens a panel or the print view,
     // and saves a picture of the window, at the given size if one is named.
+    // Play forward / backward in its three step sizes, with taps and holds (the hold is faked,
+    // the rest goes through the real code), and Ctrl on its own versus Ctrl with another key.
+    async Task StepModeChecks(List<string> log, string outputFolder)
+    {
+        var player = _player!;
+        var invariant = System.Globalization.CultureInfo.InvariantCulture;
+        double frame = player.FrameDuration;
+        string F(double seconds) => (seconds / frame).ToString("0.##", invariant);
+        string S(double seconds) => seconds.ToString("0.000", invariant);
+        void Key(System.Windows.Input.Key key, bool down) => RaiseEvent(
+            new System.Windows.Input.KeyEventArgs(System.Windows.Input.Keyboard.PrimaryDevice, PresentationSource.FromVisual(this)!, 0, key)
+            {
+                RoutedEvent = down ? System.Windows.Input.Keyboard.PreviewKeyDownEvent : System.Windows.Input.Keyboard.PreviewKeyUpEvent,
+            });
+        void CtrlAlone()
+        {
+            Key(System.Windows.Input.Key.LeftCtrl, true);
+            Key(System.Windows.Input.Key.LeftCtrl, false);
+        }
+        async Task<double> Tap(int direction, int wait = 400)
+        {
+            double before = player.Position;
+            _scrubHeldForTest = () => false;
+            StartScrub(System.Windows.Input.Key.None, direction);
+            await Task.Delay(wait);
+            return player.Position - before;
+        }
+        // Held for the given time; returns the moves seen, in the step's own unit.
+        async Task<List<double>> Hold(int direction, double seconds, Func<double, double> unit)
+        {
+            var moves = new List<double>();
+            double last = player.Position;
+            _scrubHeldForTest = () => true;
+            StartScrub(System.Windows.Input.Key.None, direction);
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            while (watch.Elapsed.TotalSeconds < seconds)
+            {
+                await Task.Delay(15);
+                double now = player.Position;
+                if (Math.Abs(now - last) > 1e-6) moves.Add(Math.Round(unit(now - last), 2));
+                last = now;
+            }
+            _scrubHeldForTest = () => false;
+            await Task.Delay(300);
+            return moves;
+        }
+
+        SetPlaying(false);
+        player.Seek(Math.Min(4, player.Duration / 3));
+        await Task.Delay(800);
+        log.Add($"step mode at start: {_stepMode} (frame {S(frame)} s)");
+        log.Add($"frame tap +1: {F(await Tap(1))} frames, playing={_videoPlaying}");
+        log.Add($"frame tap -1: {F(await Tap(-1))} frames");
+        var held = await Hold(1, 1.6, d => d / frame);
+        log.Add($"frame hold +1.6 s: first moves {string.Join(" ", held.Take(12))} ... total {held.Sum():0.#} frames in {held.Count} moves");
+        held = await Hold(-1, 1.2, d => d / frame);
+        log.Add($"frame hold -1.2 s: first moves {string.Join(" ", held.Take(12))} ... total {held.Sum():0.#} frames in {held.Count} moves");
+
+        // Ctrl with another key is a shortcut, not a switch.
+        Key(System.Windows.Input.Key.LeftCtrl, true);
+        Key(System.Windows.Input.Key.LeftShift, true);
+        Key(System.Windows.Input.Key.LeftShift, false);
+        Key(System.Windows.Input.Key.LeftCtrl, false);
+        log.Add($"ctrl+shift: mode={_stepMode}");
+
+        CtrlAlone();
+        log.Add($"ctrl alone: mode={_stepMode} note=\"{NoteText.Text}\" shown={NoteBox.Visibility} status=\"{ModeText.Text}\"");
+        await Task.Delay(200);
+        Snapshot(Path.Combine(outputFolder, "3b-step-10s.png"));
+        player.Seek(Math.Min(20, player.Duration / 4));
+        await Task.Delay(800);
+        log.Add($"10 s tap +1: {S(await Tap(1, 800))} s, playing={_videoPlaying}");
+        double before = player.Position;
+        for (int i = 0; i < 3; i++) { _scrubHeldForTest = () => false; StartScrub(System.Windows.Input.Key.None, 1); await Task.Delay(120); }
+        await Task.Delay(800);
+        log.Add($"10 s three quick taps: {S(player.Position - before)} s");
+        log.Add($"10 s tap -1: {S(await Tap(-1, 800))} s");
+        SetPlaying(true);
+        await Task.Delay(600);
+        log.Add($"10 s tap +1 while playing: {S(await Tap(1, 800))} s, still playing={_videoPlaying}");
+        bool pausedWhileHeld = false;
+        _scrubHeldForTest = () => { pausedWhileHeld |= !_videoPlaying; return true; };
+        StartScrub(System.Windows.Input.Key.None, -1);
+        await Task.Delay(1500);
+        _scrubHeldForTest = () => false;
+        await Task.Delay(300);
+        log.Add($"10 s hold -1.5 s while playing: paused while held={pausedWhileHeld}, playing after={_videoPlaying}");
+        SetPlaying(false);
+
+        CtrlAlone();
+        log.Add($"ctrl alone: mode={_stepMode} note=\"{NoteText.Text}\" status=\"{ModeText.Text}\"");
+        double percent = player.Duration * 0.02;
+        player.Seek(player.Duration / 2);
+        await Task.Delay(800);
+        log.Add($"2% tap -1: {(await Tap(-1, 800)) / percent:0.00} x 2% ({S(percent)} s)");
+        held = await Hold(1, 1.5, d => d / percent);
+        log.Add($"2% hold +1.5 s: moves {string.Join(" ", held)} (in 2% steps)");
+        Snapshot(Path.Combine(outputFolder, "3c-step-2pc.png"));
+
+        CtrlAlone();
+        log.Add($"ctrl alone: mode={_stepMode} note=\"{NoteText.Text}\" status=\"{ModeText.Text}\" button={StepForwardButton.Content}");
+        _scrubHeldForTest = null;
+    }
+
     async Task RunScreenshot(string file, string output, double seconds, string panel, string? size)
     {
         try

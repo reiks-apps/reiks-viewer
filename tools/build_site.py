@@ -73,9 +73,9 @@ T = {
 "does.h": ("What it does", "Lo que hace", "Vad den gör"),
 "does.1h": ("One frame at a time, both ways", "Fotograma a fotograma, en ambos sentidos", "En bildruta i taget, åt båda håll"),
 "does.1": (
- "Tap <kbd>X</kbd> or <kbd>Z</kbd> to move exactly one frame forward or back. Hold to keep going, faster the longer you hold. Each frame is fully decoded before it is shown, so a jump does not leave a smeared picture.",
- "Pulsa <kbd>X</kbd> o <kbd>Z</kbd> para avanzar o retroceder exactamente un fotograma. Mantén pulsado para continuar, más rápido cuanto más tiempo. Cada fotograma se decodifica por completo antes de mostrarse, así que un salto no deja la imagen corrupta.",
- "Tryck på <kbd>X</kbd> eller <kbd>Z</kbd> för att gå exakt en bildruta framåt eller bakåt. Håll nere för att fortsätta, snabbare ju längre du håller. Varje bildruta avkodas helt innan den visas, så ett hopp lämnar ingen utsmetad bild."),
+ "Tap <kbd>X</kbd> or <kbd>Z</kbd> to move exactly one frame forward or back. Hold to keep going, faster the longer you hold. Press <kbd>Ctrl</kbd> on its own to step by 10 seconds instead, or by 2% of the video. Each frame is fully decoded before it is shown, so a jump does not leave a smeared picture.",
+ "Pulsa <kbd>X</kbd> o <kbd>Z</kbd> para avanzar o retroceder exactamente un fotograma. Mantén pulsado para continuar, más rápido cuanto más tiempo. Pulsa <kbd>Ctrl</kbd> sola para avanzar de 10 en 10 segundos, o de 2 % en 2 % del vídeo. Cada fotograma se decodifica por completo antes de mostrarse, así que un salto no deja la imagen corrupta.",
+ "Tryck på <kbd>X</kbd> eller <kbd>Z</kbd> för att gå exakt en bildruta framåt eller bakåt. Håll nere för att fortsätta, snabbare ju längre du håller. Tryck på bara <kbd>Ctrl</kbd> för att i stället hoppa 10 sekunder, eller 2 % av videon. Varje bildruta avkodas helt innan den visas, så ett hopp lämnar ingen utsmetad bild."),
 "does.2h": ("Pictures, GIFs and video together", "Imágenes, GIF y vídeo juntos", "Bilder, GIF:ar och video tillsammans"),
 "does.2": (
  "Open one file and move through everything else in the folder with the arrow keys. Zoom with the mouse wheel, drag to pan, rotate and flip. Print a picture, or the frame of a paused video, with <kbd>Ctrl</kbd>+<kbd>P</kbd>.",

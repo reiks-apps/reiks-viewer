@@ -31,7 +31,7 @@ Reiks Viewer is tested on Windows 11. It should also run on Windows 10, but that
 
 ## What it does
 
-- **Frame stepping, both ways.** Tap `X` or `Z` to move exactly one frame forward or back; hold to keep going, faster the longer you hold. Each frame is fully decoded before it is shown.
+- **Frame stepping, both ways.** Tap `X` or `Z` to move exactly one frame forward or back; hold to keep going, one frame at a time at first and faster the longer you hold. Press `Ctrl` on its own to switch the step to 10 seconds, again for 2% of the video, and once more to go back to frames. Each frame is fully decoded before it is shown.
 - **Pictures, GIFs and video in one window.** Open one file and move through the rest of the folder. Zoom, pan, rotate and flip. Print a picture or the frame of a paused video.
 - **Private on screen too.** Optionally have Windows leave the window out of screenshots, recordings and screen sharing; hide file names; press `H` to blank the window at once.
 - **Image settings.** Brightness, contrast, saturation, gamma and warmth, for display only, with rotate and flip in the same menu.
@@ -45,7 +45,8 @@ Reiks Viewer is tested on Windows 11. It should also run on Windows 10, but that
 |---|---|
 | Previous / next file | `Left` / `Right`, or `C` / `V` |
 | Play / pause | `Space` |
-| One frame back / forward (hold to keep going) | `Z` / `X` |
+| One step back / forward (hold to keep going) | `Z` / `X` |
+| Switch the step: one frame, 10 seconds, 2% of the video | `Ctrl` on its own |
 | Jump 5 seconds | `Ctrl` + `Left` / `Right` |
 | Zoom | mouse wheel, `+` / `-`, `0` to reset |
 | Rotate right | `R` |

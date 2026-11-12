@@ -732,8 +732,9 @@ public partial class MainWindow
     {
         string Name(KeyAction action) => KeyName(_settings.Keys[action]);
         PlayButton.ToolTip = L.T("tip.play", Name(KeyAction.PlayPause));
-        StepBackButton.ToolTip = L.T("tip.back", Name(KeyAction.PlayBackward));
-        StepForwardButton.ToolTip = L.T("tip.forward", Name(KeyAction.PlayForward));
+        string step = "\n" + L.T("tip.step", StepModeText());
+        StepBackButton.ToolTip = L.T("tip.back", Name(KeyAction.PlayBackward)) + step;
+        StepForwardButton.ToolTip = L.T("tip.forward", Name(KeyAction.PlayForward)) + step;
         PrevButton.ToolTip = L.T("tip.prev", Name(KeyAction.PreviousFile));
         NextButton.ToolTip = L.T("tip.next", Name(KeyAction.NextFile));
     }

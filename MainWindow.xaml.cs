@@ -43,12 +43,20 @@ public partial class MainWindow : Window
     bool _panning;
     Point _panStart;
     double _panX0, _panY0;
-    const double ScrubHoldDelay = 0.3, ScrubMaxSpeed = 64;
-    readonly DispatcherTimer _scrubTimer = new() { Interval = TimeSpan.FromMilliseconds(60) };
+    const double ScrubHoldDelay = 0.3, ScrubMaxSpeed = 64, ScrubTickSeconds = 0.06, JumpsPerSecond = 3;
+    readonly DispatcherTimer _scrubTimer = new() { Interval = TimeSpan.FromSeconds(ScrubTickSeconds) };
+    readonly DispatcherTimer _noteTimer = new() { Interval = TimeSpan.FromSeconds(1.5) };
     readonly System.Diagnostics.Stopwatch _scrubWatch = new();
     Key _scrubKey = Key.None;
-    int _scrubDirection;
-    double _scrubLast, _scrubTarget;
+    int _scrubDirection, _scrubCount;
+    double _scrubOrigin, _scrubCarry, _jumpTarget = double.NaN;
+    long _jumpAt;
+    bool _scrubResume, _ctrlAlone;
+    Func<bool>? _scrubHeldForTest;
+
+    /// <summary>What one press of play forward / backward moves by. Ctrl on its own switches it.</summary>
+    enum StepMode { Frame, TenSeconds, TwoPercent }
+    StepMode _stepMode;
     bool _fullscreen;
     WindowState _stateBeforeFullscreen;
     Rect _boundsBeforeFullscreen;
@@ -81,10 +89,25 @@ public partial class MainWindow : Window
         };
         StateChanged += (_, _) => UpdateWindowFrame();
         _scrubTimer.Tick += (_, _) => ScrubTick();
+        _noteTimer.Tick += (_, _) =>
+        {
+            _noteTimer.Stop();
+            NoteBox.Visibility = Visibility.Collapsed;
+        };
         PreviewKeyUp += (_, e) =>
         {
             if (_scrubbing && e.Key == _scrubKey) StopScrub();
+            // Ctrl let go with nothing else pressed or clicked meanwhile: the next step size.
+            if (e.Key is Key.LeftCtrl or Key.RightCtrl && _ctrlAlone)
+            {
+                _ctrlAlone = false;
+                if (_isVideo && _printView == null && _capturing == null) NextStepMode();
+            }
         };
+        // Ctrl with a click, a wheel turn or a switch to another window is not Ctrl on its own.
+        PreviewMouseDown += (_, _) => _ctrlAlone = false;
+        PreviewMouseWheel += (_, _) => _ctrlAlone = false;
+        Deactivated += (_, _) => _ctrlAlone = false;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -261,7 +284,8 @@ public partial class MainWindow : Window
         _gifTimer.Stop();
         _animation = null;
         _videoTimer.Stop();
-        StopScrub();
+        StopScrub(resume: false);
+        _jumpTarget = double.NaN;
         _player?.Dispose();
         _player = null;
         VideoPanel.Visibility = Visibility.Collapsed;
@@ -342,39 +366,52 @@ public partial class MainWindow : Window
 
     void SeekBy(double seconds) => _player?.Seek(_player.Position + seconds);
 
-    // Z / X, or the two step buttons: a tap moves exactly one frame; holding moves
-    // continuously, starting at normal speed and doubling every second up to ScrubMaxSpeed.
+    // Z / X, or the two step buttons. A tap moves one step: a frame, 10 seconds or 2% of the
+    // video (Ctrl on its own switches between them). Holding keeps moving: one frame per tick,
+    // or three jumps a second, at first, twice as fast every second after that, up to
+    // ScrubMaxSpeed times normal speed for frames and one jump per tick for jumps.
+    // Stepping frames pauses the video; jumping doesn't, except while the key is held.
     // Key.None means the mouse button is what is being held.
     void StartScrub(Key key, int direction)
     {
         if (_player == null) return;
-        SetPlaying(false);
         _scrubKey = key;
         _scrubbing = true;
         _scrubDirection = direction;
+        _scrubResume = false;
         UpdateButtonStates();
-        _scrubDirection = direction;
-        _scrubLast = ScrubHoldDelay;
-        _scrubTarget = double.NaN;
-        _player.Step(direction);
+        if (_stepMode == StepMode.Frame)
+        {
+            SetPlaying(false);
+            _player.Step(direction);
+        }
+        else
+        {
+            JumpTo(JumpFrom() + direction * JumpSeconds);
+        }
+        _scrubOrigin = double.NaN;
+        _scrubCount = 0;
+        _scrubCarry = 0;
         _scrubWatch.Restart();
         _scrubTimer.Start();
     }
 
-    void StopScrub()
+    void StopScrub(bool resume = true)
     {
         _scrubTimer.Stop();
         _scrubKey = Key.None;
         _scrubbing = false;
+        if (_scrubResume && resume) SetPlaying(true);
+        _scrubResume = false;
         UpdateButtonStates();
     }
 
     void ScrubTick()
     {
         // Polled, because the release can be missed if the window loses focus mid-hold.
-        bool held = _scrubKey == Key.None
+        bool held = _scrubHeldForTest?.Invoke() ?? (_scrubKey == Key.None
             ? Mouse.LeftButton == MouseButtonState.Pressed
-            : Keyboard.IsKeyDown(_scrubKey);
+            : Keyboard.IsKeyDown(_scrubKey));
         if (_player == null || !_scrubbing || !held)
         {
             StopScrub();
@@ -382,12 +419,103 @@ public partial class MainWindow : Window
         }
         double heldFor = _scrubWatch.Elapsed.TotalSeconds;
         if (heldFor < ScrubHoldDelay) return;
-        if (double.IsNaN(_scrubTarget)) _scrubTarget = _player.Position;
-        double speed = Math.Min(ScrubMaxSpeed, Math.Pow(2, heldFor - ScrubHoldDelay));
-        _scrubTarget = Math.Clamp(_scrubTarget + _scrubDirection * speed * (heldFor - _scrubLast),
-                                  0, Math.Max(_player.Duration, 0));
-        _scrubLast = heldFor;
-        _player.Seek(_scrubTarget);
+        bool frames = _stepMode == StepMode.Frame;
+        if (double.IsNaN(_scrubOrigin))
+        {
+            // The hold carries on from where the tap's step or jump went.
+            _scrubOrigin = frames ? _player.Position : JumpFrom();
+            if (!frames && _videoPlaying)
+            {
+                SetPlaying(false);
+                _scrubResume = true;
+            }
+        }
+
+        // Counted per tick rather than per second, so the slow start really is one frame at a time.
+        double frame = _player.FrameDuration;
+        double perTick = Math.Pow(2, heldFor - ScrubHoldDelay) * (frames ? 1 : JumpsPerSecond * ScrubTickSeconds);
+        _scrubCarry += Math.Min(perTick, frames ? ScrubMaxSpeed * ScrubTickSeconds / frame : 1);
+        int whole = (int)_scrubCarry;
+        if (whole == 0) return;
+        _scrubCarry -= whole;
+        _scrubCount += whole;
+        if (frames)
+        {
+            // Aimed half a frame past the wanted frame's start, so small timing differences
+            // between frames still land on it.
+            double target = _scrubOrigin + (_scrubDirection * _scrubCount + 0.5) * frame;
+            _player.Seek(Math.Clamp(target, 0, Math.Max(_player.Duration, 0)));
+        }
+        else
+        {
+            JumpTo(_scrubOrigin + _scrubDirection * _scrubCount * JumpSeconds);
+        }
+    }
+
+    double JumpSeconds => _stepMode == StepMode.TwoPercent && _player is { Duration: > 0 } ? _player.Duration * 0.02 : 10;
+
+    // Quick taps add up: a jump still being decoded counts as done.
+    double JumpFrom() =>
+        !double.IsNaN(_jumpTarget) && Environment.TickCount64 - _jumpAt < 700 ? _jumpTarget : _player!.Position;
+
+    void JumpTo(double seconds)
+    {
+        double end = _player!.Duration;
+        _jumpTarget = end > 0 ? Math.Clamp(seconds, 0, end) : Math.Max(seconds, 0);
+        _jumpAt = Environment.TickCount64;
+        _player.Seek(_jumpTarget);
+    }
+
+    void NextStepMode()
+    {
+        _stepMode = (StepMode)(((int)_stepMode + 1) % 3);
+        if (_scrubbing) StopScrub();
+        _jumpTarget = double.NaN;
+        ShowStepMode();
+        ShowNote(StepModeText());
+        UpdateStatus();
+    }
+
+    string StepModeText() => L.T(_stepMode switch
+    {
+        StepMode.TenSeconds => "step.seconds",
+        StepMode.TwoPercent => "step.percent",
+        _ => "step.frame",
+    });
+
+    /// <summary>The step buttons carry the step size under their arrow while it isn't one frame.</summary>
+    void ShowStepMode()
+    {
+        string? size = _stepMode switch
+        {
+            StepMode.TenSeconds => "10 s",
+            StepMode.TwoPercent => "2%",
+            _ => null,
+        };
+        object Content(string glyph) => size == null ? glyph : new StackPanel
+        {
+            Children =
+            {
+                new TextBlock { Text = glyph, FontSize = 12, HorizontalAlignment = HorizontalAlignment.Center },
+                new TextBlock
+                {
+                    Text = size, FontSize = 10, FontFamily = new FontFamily("Segoe UI"),
+                    HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 1, 0, 0),
+                },
+            },
+        };
+        StepBackButton.Content = Content("");
+        StepForwardButton.Content = Content("");
+        UpdateKeyHints();
+    }
+
+    /// <summary>A short message over the picture that goes away by itself (seen in fullscreen too).</summary>
+    void ShowNote(string text)
+    {
+        NoteText.Text = text;
+        NoteBox.Visibility = Visibility.Visible;
+        _noteTimer.Stop();
+        _noteTimer.Start();
     }
 
     void UpdateVideoProgress()
@@ -647,6 +775,8 @@ public partial class MainWindow : Window
 
         var modes = new List<string>();
         if (Zoom.ScaleX > 1) modes.Add(L.T("status.zoom", (Zoom.ScaleX * 100).ToString("0")));
+        if (_isVideo && _stepMode == StepMode.TenSeconds) modes.Add(L.T("status.seconds"));
+        if (_isVideo && _stepMode == StepMode.TwoPercent) modes.Add(L.T("status.percent"));
         if (_settings.RepeatFile) modes.Add(L.T("status.repeat"));
         else if (_settings.PlayFolder) modes.Add(L.T(_settings.Shuffle ? "status.shuffled" : "status.folder"));
         ModeText.Text = string.Join("  ·  ", modes);
@@ -657,6 +787,16 @@ public partial class MainWindow : Window
     void OnKeyDown(object sender, KeyEventArgs e)
     {
         bool ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        // Ctrl on its own switches the step size when it is let go (PreviewKeyUp); any other
+        // key pressed meanwhile makes it a shortcut instead.
+        if (e.Key is Key.LeftCtrl or Key.RightCtrl)
+        {
+            if (!e.IsRepeat) _ctrlAlone = true;
+        }
+        else
+        {
+            _ctrlAlone = false;
+        }
         e.Handled = true;
 
         if (_printView != null)

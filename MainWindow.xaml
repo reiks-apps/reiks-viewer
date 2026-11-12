@@ -92,6 +92,12 @@
                        TextWrapping="Wrap" MaxWidth="560"
                        HorizontalAlignment="Center" VerticalAlignment="Center"
                        Text="Drop a picture, GIF or video here, or press O to open one."/>
+            <!-- Short messages, such as the new step size after Ctrl; they go away by themselves -->
+            <Border x:Name="NoteBox" Background="{DynamicResource WindowBrush}" Opacity="0.92" CornerRadius="6"
+                    Padding="14,7" Margin="0,20,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
+                    Visibility="Collapsed" IsHitTestVisible="False">
+                <TextBlock x:Name="NoteText" Foreground="{DynamicResource TextBrush}" FontSize="15"/>
+            </Border>
             <!-- Quick hide: covers the picture until the key is pressed again -->
             <Border x:Name="Cover" Background="{DynamicResource WindowBrush}" Visibility="Collapsed"/>
         </Grid>

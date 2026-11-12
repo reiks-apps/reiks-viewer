@@ -47,7 +47,7 @@ Reiks Viewer is free and open source. Pictures and video are decoded with librar
 
 **What's new in this version**
 
-First version in the Microsoft Store. It includes printing, with a preview of the page.
+Play forward and backward now have three step sizes: one frame, 10 seconds or 2% of the video. Press Ctrl on its own to switch. Holding the key now starts one frame at a time and gets faster the longer you hold.
 
 **Product features**
 
@@ -113,7 +113,7 @@ Reiks Visor es gratuito y de código abierto. Las imágenes y el vídeo se decod
 
 **Novedades de esta versión**
 
-Primera versión en Microsoft Store. Incluye la impresión, con vista previa de la página.
+Reproducir hacia delante y hacia atrás tienen ahora tres pasos: un fotograma, 10 segundos o el 2 % del vídeo. Pulsa Ctrl sola para cambiar. Al mantener pulsada la tecla, ahora empieza fotograma a fotograma y va más rápido cuanto más tiempo la mantienes.
 
 **Características del producto**
 
@@ -179,7 +179,7 @@ Reiks Visare är gratis och har öppen källkod. Bilder och video avkodas med bi
 
 **Nyheter i den här versionen**
 
-Första versionen i Microsoft Store. Den innehåller utskrift, med förhandsvisning av sidan.
+Spela framåt och bakåt har nu tre steglängder: en bildruta, 10 sekunder eller 2 % av videon. Tryck på bara Ctrl för att byta. När du håller nere tangenten börjar det nu en bildruta i taget och går snabbare ju längre du håller.
 
 **Produktfunktioner**
 
@@ -245,7 +245,7 @@ Reiks Visionneuse est gratuite et open source. Les images et la vidéo sont déc
 
 **Nouveautés de cette version**
 
-Première version dans le Microsoft Store. Elle comprend l'impression, avec un aperçu de la page.
+La lecture avant et arrière a maintenant trois pas : une image, 10 secondes ou 2 % de la vidéo. Appuyez sur Ctrl seule pour changer. En maintenant la touche, l'avance commence maintenant image par image et accélère plus vous la maintenez.
 
 **Fonctionnalités du produit**
 
@@ -311,7 +311,7 @@ Reiks Betrachter ist kostenlos und quelloffen. Bilder und Videos werden mit Bibl
 
 **Neuerungen in dieser Version**
 
-Erste Version im Microsoft Store. Sie enthält das Drucken, mit einer Vorschau der Seite.
+Vorwärts und rückwärts abspielen hat jetzt drei Schrittweiten: ein Bild, 10 Sekunden oder 2 % des Videos. Zum Wechseln nur Strg drücken. Beim Gedrückthalten der Taste geht es jetzt zuerst Bild für Bild und dann immer schneller, je länger man hält.
 
 **Produktfunktionen**
 
@@ -377,7 +377,7 @@ O Reiks Visualizador é gratuito e de código aberto. As imagens e o vídeo são
 
 **Novidades desta versão**
 
-Primeira versão na Microsoft Store. Inclui a impressão, com pré-visualização da página.
+Reproduzir para a frente e para trás tem agora três passos: um fotograma, 10 segundos ou 2% do vídeo. Prima só Ctrl para mudar. Ao manter a tecla premida, começa agora um fotograma de cada vez e acelera quanto mais tempo a mantiver.
 
 **Funcionalidades do produto**
 
@@ -443,7 +443,7 @@ Reiks Visualizzatore è gratuito e open source. Immagini e video sono decodifica
 
 **Novità di questa versione**
 
-Prima versione nel Microsoft Store. Include la stampa, con l'anteprima della pagina.
+La riproduzione in avanti e all'indietro ha ora tre passi: un fotogramma, 10 secondi o il 2% del video. Premi solo Ctrl per cambiare. Tenendo premuto il tasto, ora si parte un fotogramma alla volta e si accelera più a lungo lo tieni premuto.
 
 **Caratteristiche del prodotto**
 
